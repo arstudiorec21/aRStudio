@@ -151,9 +151,9 @@ function googleDriveImageUrl(url){
   var raw = String(url || '').trim();
   var id = googleDriveFileId(raw);
   if (!id) return raw;
-  // Use Drive's direct-view endpoint instead of the thumbnail endpoint.
-  // This avoids requesting an explicitly resized/compressed thumbnail.
-  return 'https://drive.google.com/uc?export=view&id=' + encodeURIComponent(id);
+  // Serve public Google Drive images through our own Cloudflare Pages Function.
+  // This avoids Drive thumbnail compression and browser-side redirect/CORS issues.
+  return window.location.origin + '/media/' + encodeURIComponent(id);
 }
 function googleDrivePreviewUrl(url){
   var id = googleDriveFileId(url);
