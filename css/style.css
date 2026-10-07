@@ -281,3 +281,49 @@ body[data-page]:not([data-page="home"]) header{position:relative;background:#0c0
     font-size: .52rem;
   }
 }
+
+/* ===== Full Price mobile overflow fix ===== */
+@media (max-width: 680px) {
+  .page-main.prices-page .detail-price-grid,
+  .page-main.prices-page .detail-price-grid > * {
+    min-width: 0;
+  }
+
+  .page-main.prices-page .detail-price-grid .price-card {
+    overflow: hidden;
+  }
+
+  .page-main.prices-page .detail-price-grid .amount {
+    width: 100%;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: normal;
+    word-break: normal;
+    text-wrap: balance;
+    font-size: clamp(.78rem, 3.55vw, .98rem);
+    line-height: 1.18;
+    letter-spacing: -.018em;
+    padding-inline: 0;
+  }
+
+  .page-main.prices-page .detail-price-grid .amount small {
+    display: inline-block;
+    white-space: nowrap;
+    font-size: .48rem;
+    margin-left: 2px;
+    vertical-align: baseline;
+  }
+
+  .page-main.prices-page .detail-price-grid .features li {
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 390px) {
+  .page-main.prices-page .detail-price-grid .amount {
+    font-size: clamp(.72rem, 3.6vw, .86rem);
+  }
+  .page-main.prices-page .detail-price-grid .amount small {
+    font-size: .45rem;
+  }
+}
