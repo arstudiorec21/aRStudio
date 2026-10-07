@@ -147,6 +147,14 @@ function googleDriveFileId(url){
   if (m) return m[1];
   return '';
 }
+function googleDriveImageUrl(url){
+  var raw = String(url || '').trim();
+  var id = googleDriveFileId(raw);
+  if (!id) return raw;
+  // Use Drive's direct-view endpoint instead of the thumbnail endpoint.
+  // This avoids requesting an explicitly resized/compressed thumbnail.
+  return 'https://drive.google.com/uc?export=view&id=' + encodeURIComponent(id);
+}
 function googleDrivePreviewUrl(url){
   var id = googleDriveFileId(url);
   return id ? 'https://drive.google.com/file/d/' + encodeURIComponent(id) + '/preview' : '';
@@ -157,7 +165,7 @@ function trackInitials(text){
   return ((parts[0][0] || '') + (parts.length > 1 ? (parts[1][0] || '') : '')).toUpperCase().slice(0, 2);
 }
 function coverMarkup(x){
-  var src = safeUrl(x.coverUrl);
+  var src = safeUrl(googleDriveImageUrl(x.coverUrl));
   if (src) {
     return '<img class="audio-cover" src="' + src + '" alt="' + esc(x.title) + '" loading="lazy">';
   }
@@ -243,7 +251,7 @@ function priceCard(x){
 function galleryCategory(x){ var c = String(x.category || 'Studio').trim(); return c || 'Studio'; }
 function galleryCard(x){
   var c = galleryCategory(x);
-  return '<figure class="detail-gallery-card" data-category="' + esc(c) + '"><img src="' + safeUrl(x.imageUrl) + '" alt="' + esc(x.title) + '" loading="lazy"><figcaption>' + esc(x.title) + '<small>' + esc(c) + '</small></figcaption></figure>';
+  return '<figure class="detail-gallery-card" data-category="' + esc(c) + '"><img src="' + safeUrl(googleDriveImageUrl(x.imageUrl)) + '" alt="' + esc(x.title) + '" loading="lazy"><figcaption>' + esc(x.title) + '<small>' + esc(c) + '</small></figcaption></figure>';
 }
 
 function renderCommon(){
@@ -266,7 +274,7 @@ function renderHome(){
   if (h) h.innerHTML = accentLast(s.heroTitle || 'TURN YOUR SOUND INTO SOMETHING GREAT.');
   setText('#heroSubtitle', s.heroSubtitle);
   var hero = one('.hero');
-  if (hero && s.heroImage) hero.style.backgroundImage = "url('" + safeUrl(s.heroImage) + "')";
+  if (hero && s.heroImage) hero.style.backgroundImage = "url('" + safeUrl(googleDriveImageUrl(s.heroImage)) + "')";
   setText('#studioName', s.studioName);
   setText('#address', s.address);
   setText('#hours', s.hours);
@@ -289,7 +297,7 @@ function renderHome(){
 
   var gl = one('#galleryList');
   if (gl) gl.innerHTML = gallery.map(function(x){
-    return '<figure class="gallery-card"><img src="' + safeUrl(x.imageUrl) + '" alt="' + esc(x.title) + '" loading="lazy"><span>' + esc(x.title) + '</span></figure>';
+    return '<figure class="gallery-card"><img src="' + safeUrl(googleDriveImageUrl(x.imageUrl)) + '" alt="' + esc(x.title) + '" loading="lazy"><span>' + esc(x.title) + '</span></figure>';
   }).join('');
 
   var ss = one('#serviceSelect');
@@ -299,15 +307,7 @@ function renderHome(){
   if (mb && s.mapEmbedUrl) mb.innerHTML = '<iframe title="Lokasi AR Studio" src="' + safeUrl(s.mapEmbedUrl) + '" loading="lazy"></iframe>';
 
   function engineerImageUrl(url) {
-    url = String(url || '').trim();
-    if (!url) return '';
-    var m = url.match(/drive\.google\.com\/file\/d\/([^/?#]+)/i);
-    if (m) return 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(m[1]) + '&sz=w2000';
-    var id = url.match(/[?&]id=([^&#]+)/i);
-    if (/drive\.google\.com\/thumbnail/i.test(url) && id) {
-      return 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(id[1]) + '&sz=w2000';
-    }
-    return url;
+    return googleDriveImageUrl(url);
   }
 
   var portrait = one('#engineerPortrait');
