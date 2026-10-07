@@ -298,26 +298,28 @@ function renderHome(){
   var mb = one('#mapBox');
   if (mb && s.mapEmbedUrl) mb.innerHTML = '<iframe title="Lokasi AR Studio" src="' + safeUrl(s.mapEmbedUrl) + '" loading="lazy"></iframe>';
 
-  var portrait = one('#engineerPortrait');
-  var monogram = one('#engineerMonogram');
-  if (portrait) {
-    var engineerImage = safeUrl(s.engineerImage);
-    if (engineerImage) {
-      portrait.style.backgroundImage = "linear-gradient(0deg,rgba(5,5,6,.44),rgba(5,5,6,.04) 55%),url('" + engineerImage + "')";
-      portrait.style.backgroundSize = 'cover';
-      portrait.style.backgroundPosition = s.engineerImagePosition || 'center 25%';
-      portrait.classList.add('has-photo');
-      if (monogram) monogram.setAttribute('aria-hidden', 'true');
-    } else {
-      portrait.style.backgroundImage = '';
-      portrait.classList.remove('has-photo');
-      if (monogram) monogram.removeAttribute('aria-hidden');
+  function engineerImageUrl(url) {
+    url = String(url || '').trim();
+    if (!url) return '';
+    var m = url.match(/drive\.google\.com\/file\/d\/([^/?#]+)/i);
+    if (m) return 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(m[1]) + '&sz=w2000';
+    var id = url.match(/[?&]id=([^&#]+)/i);
+    if (/drive\.google\.com\/thumbnail/i.test(url) && id) {
+      return 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(id[1]) + '&sz=w2000';
     }
+    return url;
+  }
+
+  var portrait = one('#engineerPortrait');
+  if (portrait && s.engineerImage) {
+    portrait.style.backgroundImage = "url('" + safeUrl(engineerImageUrl(s.engineerImage)) + "')";
+    portrait.style.backgroundSize = 'cover';
+    portrait.style.backgroundPosition = s.engineerImagePosition || 'center 22%';
+    portrait.classList.add('has-photo');
   }
   setText('#engineerName', s.engineerName || 'Afif Ramdhan');
   setText('#engineerRole', s.engineerRole || 'Recording & Mixing Engineer · Music Producer');
   setText('#engineerBio', s.engineerBio || 'Saya membantu musisi mengubah ide dan rekaman mentah menjadi produksi musik yang siap dirilis — dari recording, editing, mixing, mastering, hingga arrangement.');
-  setText('#engineerPortraitLabel', s.engineerPortraitLabel || 'ENGINEER / PRODUCER');
   setText('#proof1Title', s.proof1Title || '3rd Place');
   setText('#proof1Text', s.proof1Text || 'National Mixing Competition');
   setText('#proof2Title', s.proof2Title || 'AR Studio');
