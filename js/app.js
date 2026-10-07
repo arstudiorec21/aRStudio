@@ -251,7 +251,63 @@ function priceCard(x){
 function galleryCategory(x){ var c = String(x.category || 'Studio').trim(); return c || 'Studio'; }
 function galleryCard(x){
   var c = galleryCategory(x);
-  return '<figure class="detail-gallery-card" data-category="' + esc(c) + '"><img src="' + safeUrl(googleDriveImageUrl(x.imageUrl)) + '" alt="' + esc(x.title) + '" loading="lazy"><figcaption>' + esc(x.title) + '<small>' + esc(c) + '</small></figcaption></figure>';
+  var src = safeUrl(googleDriveImageUrl(x.imageUrl));
+  return '<figure class="detail-gallery-card" data-category="' + esc(c) + '" data-gallery-src="' + src + '" data-gallery-title="' + esc(x.title) + '" data-gallery-category="' + esc(c) + '" tabindex="0" role="button" aria-label="Buka foto ' + esc(x.title) + '"><img src="' + src + '" alt="' + esc(x.title) + '" loading="lazy"><figcaption>' + esc(x.title) + '<small>' + esc(c) + '</small></figcaption></figure>';
+}
+
+function ensureGalleryLightbox(){
+  if (one('#galleryLightbox')) return;
+  var el = document.createElement('div');
+  el.id = 'galleryLightbox';
+  el.className = 'gallery-lightbox';
+  el.setAttribute('aria-hidden','true');
+  el.innerHTML = '<button type="button" class="gallery-lightbox-close" aria-label="Tutup">×</button><button type="button" class="gallery-lightbox-nav prev" aria-label="Foto sebelumnya">‹</button><div class="gallery-lightbox-stage"><img id="galleryLightboxImage" alt=""><div class="gallery-lightbox-caption"><strong id="galleryLightboxTitle"></strong><span id="galleryLightboxCategory"></span></div></div><button type="button" class="gallery-lightbox-nav next" aria-label="Foto berikutnya">›</button>';
+  document.body.appendChild(el);
+
+  function visibleCards(){ return all('.detail-gallery-card').filter(function(c){ return c.style.display !== 'none'; }); }
+  function showCard(card){
+    if (!card) return;
+    one('#galleryLightboxImage').src = card.getAttribute('data-gallery-src') || '';
+    one('#galleryLightboxImage').alt = card.getAttribute('data-gallery-title') || 'Gallery AR Studio';
+    setText('#galleryLightboxTitle', card.getAttribute('data-gallery-title') || '');
+    setText('#galleryLightboxCategory', card.getAttribute('data-gallery-category') || '');
+    el.dataset.currentSrc = card.getAttribute('data-gallery-src') || '';
+  }
+  function move(step){
+    var cards = visibleCards();
+    if (!cards.length) return;
+    var current = el.dataset.currentSrc || '';
+    var idx = cards.findIndex(function(c){ return (c.getAttribute('data-gallery-src') || '') === current; });
+    if (idx < 0) idx = 0;
+    idx = (idx + step + cards.length) % cards.length;
+    showCard(cards[idx]);
+  }
+  el.querySelector('.gallery-lightbox-close').onclick = closeGalleryLightbox;
+  el.querySelector('.gallery-lightbox-nav.prev').onclick = function(e){ e.stopPropagation(); move(-1); };
+  el.querySelector('.gallery-lightbox-nav.next').onclick = function(e){ e.stopPropagation(); move(1); };
+  el.onclick = function(e){ if (e.target === el) closeGalleryLightbox(); };
+  el._showCard = showCard;
+  el._move = move;
+}
+
+function openGalleryLightbox(card){
+  ensureGalleryLightbox();
+  var el = one('#galleryLightbox');
+  if (!el) return;
+  if (el._showCard) el._showCard(card);
+  el.classList.add('open');
+  el.setAttribute('aria-hidden','false');
+  document.body.classList.add('lightbox-open');
+}
+
+function closeGalleryLightbox(){
+  var el = one('#galleryLightbox');
+  if (!el) return;
+  el.classList.remove('open');
+  el.setAttribute('aria-hidden','true');
+  var im = one('#galleryLightboxImage');
+  if (im) im.src = '';
+  document.body.classList.remove('lightbox-open');
 }
 
 function renderCommon(){
@@ -468,6 +524,16 @@ function bindDynamic(){
       });
     };
   });
+
+  all('.detail-gallery-card').forEach(function(card){
+    card.onclick = function(){ openGalleryLightbox(card); };
+    card.onkeydown = function(e){
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openGalleryLightbox(card);
+      }
+    };
+  });
 }
 
 function bindStatic(){
@@ -504,6 +570,13 @@ function bindStatic(){
       closeDriveAudioModal();
       var vm = one('#videoModal');
       if (vm) vm.classList.remove('open');
+      closeGalleryLightbox();
+    } else if (e.key === 'ArrowLeft') {
+      var gl = one('#galleryLightbox');
+      if (gl && gl.classList.contains('open') && gl._move) gl._move(-1);
+    } else if (e.key === 'ArrowRight') {
+      var gl2 = one('#galleryLightbox');
+      if (gl2 && gl2.classList.contains('open') && gl2._move) gl2._move(1);
     }
   });
 
