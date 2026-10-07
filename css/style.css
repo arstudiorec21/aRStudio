@@ -197,3 +197,87 @@ body[data-page]:not([data-page="home"]) header{position:relative;background:#0c0
   .prices-compact .price-card { padding: 14px 10px; }
   .prices-compact .amount { font-size: 1rem; }
 }
+
+/* ===== Full Price page: 2-column mobile grid ===== */
+@media (max-width: 680px) {
+  .page-main.prices-page .detail-price-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .page-main.prices-page .detail-price-grid .price-card {
+    padding: 15px 11px;
+    border-radius: 10px;
+    min-width: 0;
+  }
+
+  .page-main.prices-page .detail-price-grid .price-card h3 {
+    font-size: .69rem;
+    line-height: 1.25;
+    min-height: 2.5em;
+    margin-bottom: 8px;
+  }
+
+  .page-main.prices-page .detail-price-grid .starting {
+    font-size: .55rem;
+    margin: 5px 0 2px;
+  }
+
+  .page-main.prices-page .detail-price-grid .amount {
+    font-size: 1.08rem;
+    line-height: 1.15;
+    margin: 4px 0 9px;
+    white-space: nowrap;
+  }
+
+  .page-main.prices-page .detail-price-grid .amount small {
+    font-size: .5rem;
+  }
+
+  .page-main.prices-page .detail-price-grid .features {
+    padding: 9px 0;
+  }
+
+  .page-main.prices-page .detail-price-grid .features li {
+    font-size: .56rem;
+    line-height: 1.35;
+    margin: 6px 0;
+  }
+
+  .page-main.prices-page .detail-price-grid .features li:before {
+    margin-right: 5px;
+  }
+
+  .page-main.prices-page .detail-price-grid .price-actions {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .page-main.prices-page .detail-price-grid .price-action {
+    padding: 9px 5px;
+    font-size: .54rem;
+  }
+}
+
+@media (max-width: 390px) {
+  .page-main.prices-page .detail-price-grid {
+    gap: 8px;
+  }
+
+  .page-main.prices-page .detail-price-grid .price-card {
+    padding: 13px 9px;
+  }
+
+  .page-main.prices-page .detail-price-grid .amount {
+    font-size: .96rem;
+  }
+
+  .page-main.prices-page .detail-price-grid .price-card h3 {
+    font-size: .64rem;
+  }
+
+  .page-main.prices-page .detail-price-grid .features li {
+    font-size: .52rem;
+  }
+}
